@@ -1,0 +1,15 @@
+{
+  "name": "hdmi-web-stream",
+  "version": "1.0.0",
+  "description": "HDMI Web stream",
+  "main": "main.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "electron ."
+  },
+  "author": "bmbl",
+  "license": "ISC",
+  "devDependencies": {
+    "electron": "^25.4.0"
+  }
+}

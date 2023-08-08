@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta charset="UTF-8">
+        <title>HDMI Web stream</title>
+        <style>
+            * {
+                outline: none;
+            }
+
+            html {
+                font-family: sans-serif;
+            }
+
+            select {
+                width: 100%;
+                margin-top: 2px;
+            }
+        </style>
+    </head>
+    <body>
+        <label for="video-input-chooser">📹 Wejście wideo</label>
+        <select id="video-input-chooser"></select>
+
+        <div style="width: 100%; height: 7px;"></div>
+
+        <label for="audio-input-chooser">🔊 Wejście audio</label>
+        <select id="audio-input-chooser"></select>
+
+        <hr/>
+
+        <button id="start-btn" disabled>Wczytywanie urządzeń...</button>
+        <button onclick="window.desktopAppApi.openDevTools();">DevTools</button>
+
+        <script src="frontend.js"></script>
+    </body>
+</html>
