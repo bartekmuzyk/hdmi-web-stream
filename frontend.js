@@ -48,13 +48,59 @@ function onGotDevices(devices) {
     startBtn.innerText = "Rozpocznij strumień";
 }
 
-navigator.mediaDevices.enumerateDevices().then(onGotDevices);
+let peerConnection = new RTCPeerConnection({
+    iceServers: [
+        {
+            urls: "stun:stun.l.google.com:19302"
+        }
+    ]
+});
 
 startBtn.onclick = async () => {
-    console.log(videoInputChooser.value);
-    console.log(audioInputChooser.value);
-    // navigator.mediaDevices.getUserMedia({
-    //     video: true,
-    //     audio: true
+    console.log("video: " + videoInputChooser.value);
+    console.log("audio: " + audioInputChooser.value);
+
+    let iceCandidates = [];
+    peerConnection.addEventListener("icecandidate", event => {
+        iceCandidates.push(event.candidate);
+    });
+
+    window.desktopAppApi.onGotRtcOffer(async (event, offer) => {
+        await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
+        const answer = await peerConnection.createAnswer();
+        await peerConnection.setLocalDescription(answer);
+
+        event.sender.send("rtc-answer", answer);
+    });
+
+    window.desktopAppApi.onGotIceCandidates(async (event, candidates) => {
+        for (const candidate of candidates) {
+            await peerConnection.addIceCandidate(candidate);
+        }
+
+        if (peerConnection.iceGatheringState === "complete") {
+            event.sender.send("ice-candidates", iceCandidates);
+        } else {
+            peerConnection.addEventListener("icegatheringstatechange", event => {
+                if (event.target.iceGatheringState === "complete") {
+                    event.sender.send("ice-candidates", iceCandidates);
+                }
+            });
+        }
+    });
+
+    // await navigator.mediaDevices.getUserMedia({
+    //     video: {
+    //         deviceId: {
+    //             exact: videoInputChooser.value
+    //         }
+    //     },
+    //     audio: {
+    //         deviceId: {
+    //             exact: audioInputChooser.value
+    //         }
+    //     }
     // });
 };
+
+navigator.mediaDevices.enumerateDevices().then(onGotDevices);
