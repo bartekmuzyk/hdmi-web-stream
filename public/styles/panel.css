@@ -1,0 +1,82 @@
+html, body {
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+}
+
+#status-bar {
+    height: 60px;
+    border-bottom: 1px solid #fff2;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+}
+
+#live-status-dot {
+    width: 20px;
+    height: 20px;
+    border-radius: 20px;
+    margin: 0 10px;
+}
+
+#live-status {
+    font-size: 2rem;
+    color: white;
+    font-weight: bold;
+    flex-grow: 1;
+}
+
+#status-bar[data-livestatus="stopped"] > #live-status-dot {
+    background-color: #F44336;
+}
+
+#status-bar[data-livestatus="progress"] > #live-status-dot {
+    background-color: #FDD835;
+}
+
+#status-bar[data-livestatus="started"] > #live-status-dot {
+    background-color: #4CAF50;
+}
+
+#status-bar[data-livestatus="connecting"] > #live-status-dot {
+    background-color: gray;
+}
+
+#device-config h4 {
+    color: white;
+    margin-bottom: 0 !important;
+    margin-top: 10px !important;
+}
+
+#device-config {
+    width: 100%;
+    height: calc(100% - 60px);
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto 1fr;
+}
+
+#device-config > div {
+    height: 100%;
+    overflow-y: auto;
+    padding: 0 10px;
+}
+
+#device-config > h4 {
+    padding: 0 10px;
+}
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #ffffff11;
+    border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #ffffff11;
+    border-radius: 8px;
+}

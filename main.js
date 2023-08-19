@@ -1,15 +1,14 @@
 const {app, BrowserWindow, ipcMain} = require("electron");
 const path = require("path");
-const {offerCallback, iceCandidateCallback} = require("./server.js");
+const {interaction} = require("./server.js");
 
 function createWindow() {
     const win = new BrowserWindow({
-        width: 300,
-        height: 200,
+        width: 650,
+        height: 300,
         resizable: false,
         webPreferences: {
-            preload: path.join(__dirname, "preload.js"),
-            nodeIntegration: true
+            preload: path.join(__dirname, "preload.js")
         }
     });
     win.setMenu(null);
@@ -22,27 +21,13 @@ function createWindow() {
         });
     });
 
-    ipcMain.on("rtc-answer", (_event, answer) => {
-        console.log("passing answer to browser: %o", answer);
-        offerCallback.passAnswer(answer);
+    ipcMain.on("quit", () => {
+        win.close();
     });
 
-    offerCallback.offerCb = offer => {
-        console.log("sending offer to frontend: %o", offer);
-        win.webContents.send("rtc-offer", offer);
-    };
 
-    ipcMain.on("ice-candidates", (_event, candidates) => {
-        console.log("passing candidates to browser");
-        iceCandidateCallback.passCandidates(candidates);
-    });
-
-    iceCandidateCallback.sendCandidatesCallback = candidates => {
-        console.log("sending candidates to frontend")
-        win.webContents.send("ice-candidates", candidates);
-    };
-
-    win.loadFile("index.html");
+    const sessionData = interaction.createSession();
+    win.loadURL(`http://localhost:7284/panel?${new URLSearchParams(sessionData)}`);
 }
 
 app.whenReady().then(() => {

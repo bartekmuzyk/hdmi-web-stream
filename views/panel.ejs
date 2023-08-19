@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="pl">
+    <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Transmiter sygnału HDMI</title>
+        <link rel="stylesheet" href="/styles/main.css">
+        <link rel="stylesheet" href="/styles/panel.css">
+        <link rel="stylesheet" href="/styles/materialize.min.css">
+        <script src="/js/materialize.min.js"></script>
+        <script src="/js/socket.io.min.js"></script>
+    </head>
+    <body>
+        <div id="status-bar" data-livestatus="connecting">
+            <div id="live-status-dot"></div>
+            <label id="live-status">Łączenie...</label>
+            <button class="waves-effect waves-light btn-flat white-text" onclick="window.desktopAppApi.openDevTools();" style="margin-right: 10px;">
+                <i class="material-icons left">code</i> DevTools
+            </button>
+            <button id="go-live-btn" class="waves-effect waves-light btn" disabled>
+                <i class="material-icons left">play_arrow</i>
+                Start
+            </button>
+            <button id="stop-stream-btn" class="waves-effect waves-dark btn red white-text" style="display: none;">
+                <i class="material-icons left">stop</i>
+                Stop
+            </button>
+        </div>
+        <div id="device-config">
+            <h4>Wejście wideo</h4>
+            <h4>Wejście audio</h4>
+            <div id="video-input-select"></div>
+            <div id="audio-input-select"></div>
+        </div>
+
+        <div id="connection-error-modal" class="modal">
+            <div class="modal-content">
+                <h4>Błąd podczas łączenia</h4>
+                <p>
+                    Nie udało się połączyć z serwerem wymiany informacji, co uniemożliwia rozpoczęcie transmisji. Wiadomość błędu:
+                </p>
+                <pre id="error-message"></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="waves-effect waves-dark black-text btn-flat" onclick="location.reload();">
+                    Spróbuj od nowa
+                </button>
+            </div>
+        </div>
+
+        <div id="disconnection-modal" class="modal">
+            <div class="modal-content">
+                <h4>:(</h4>
+                <p>
+                    Nastąpiło niespodziewane rozłączenie z serwerem wymiany informacji, co uniemożliwia dalsze
+                    prowadzenie transmisji. Powód:
+                </p>
+                <pre id="disconnect-reason"></pre>
+            </div>
+            <div class="modal-footer">
+                <button class="waves-effect waves-dark black-text btn-flat" onclick="location.reload();">
+                    Spróbuj od nowa
+                </button>
+            </div>
+        </div>
+
+        <script src="/js/panel.js" defer></script>
+    </body>
+</html>
