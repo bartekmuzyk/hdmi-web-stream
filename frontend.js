@@ -62,27 +62,38 @@ startBtn.onclick = async () => {
 
     let iceCandidates = [];
     peerConnection.addEventListener("icecandidate", event => {
+        console.log("new ice candidate: %o", event.candidate);
         iceCandidates.push(event.candidate);
     });
 
     window.desktopAppApi.onGotRtcOffer(async (event, offer) => {
+        console.log("got offer: %o", offer);
+
         await peerConnection.setRemoteDescription(new RTCSessionDescription(offer));
         const answer = await peerConnection.createAnswer();
         await peerConnection.setLocalDescription(answer);
 
-        event.sender.send("rtc-answer", answer);
+        console.log("sending answer: %o", answer);
+
+        event.sender.send("rtc-answer", answer.toJSON());
     });
 
     window.desktopAppApi.onGotIceCandidates(async (event, candidates) => {
+        console.log("got ice candidates")
+
         for (const candidate of candidates) {
             await peerConnection.addIceCandidate(candidate);
         }
 
+        console.log("trying to send ice candidates");
+
         if (peerConnection.iceGatheringState === "complete") {
+            console.log("sending ice candidates");
             event.sender.send("ice-candidates", iceCandidates);
         } else {
             peerConnection.addEventListener("icegatheringstatechange", event => {
                 if (event.target.iceGatheringState === "complete") {
+                    console.log("sending ice candidates");
                     event.sender.send("ice-candidates", iceCandidates);
                 }
             });

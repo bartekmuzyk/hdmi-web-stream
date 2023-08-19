@@ -5,7 +5,7 @@ const {offerCallback, iceCandidateCallback} = require("./server.js");
 function createWindow() {
     const win = new BrowserWindow({
         width: 300,
-        height: 142,
+        height: 200,
         resizable: false,
         webPreferences: {
             preload: path.join(__dirname, "preload.js"),
@@ -23,18 +23,22 @@ function createWindow() {
     });
 
     ipcMain.on("rtc-answer", (_event, answer) => {
+        console.log("passing answer to browser: %o", answer);
         offerCallback.passAnswer(answer);
     });
 
     offerCallback.offerCb = offer => {
+        console.log("sending offer to frontend: %o", offer);
         win.webContents.send("rtc-offer", offer);
     };
 
     ipcMain.on("ice-candidates", (_event, candidates) => {
+        console.log("passing candidates to browser");
         iceCandidateCallback.passCandidates(candidates);
     });
 
     iceCandidateCallback.sendCandidatesCallback = candidates => {
+        console.log("sending candidates to frontend")
         win.webContents.send("ice-candidates", candidates);
     };
 

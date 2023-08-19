@@ -5,6 +5,8 @@
         <title>HDMI Web stream</title>
     </head>
     <body>
+        <button id="start-btn">Rozpocznij</button>
+
         <script>
             async function makeCall() {
                 const configuration = {
@@ -15,18 +17,21 @@
                     ]
                 };
                 const peerConnection = new RTCPeerConnection(configuration);
-                const offer = await peerConnection.createOffer();
-                await peerConnection.setLocalDescription(offer);
-
                 const iceCandidates = [];
                 peerConnection.addEventListener("icecandidate", event => {
+                    console.log("new ice candidate: %o", event.candidate);
                     iceCandidates.push(event.candidate);
                 });
                 peerConnection.addEventListener("icegatheringstatechange", event => {
+                    console.log("iceGathertingState: " + event.target.iceGatheringState);
+
                     if (event.target.iceGatheringState === "complete") {
                         fetch("/ice", {
                             method: "POST",
-                            body: JSON.stringify(iceCandidates)
+                            body: JSON.stringify(iceCandidates),
+                            headers: {
+                                "Content-Type": "application/json"
+                            }
                         })
                             .then(response => response.json())
                             .then(async remoteIceCandidates => {
@@ -37,15 +42,23 @@
                     }
                 });
 
+                const offer = await peerConnection.createOffer();
+                await peerConnection.setLocalDescription(offer);
+
                 const response = await fetch("/offer", {
                     method: "POST",
-                    body: JSON.stringify(offer)
+                    body: JSON.stringify(offer),
+                    headers: {
+                        "Content-Type": "application/json"
+                    }
                 });
                 const answer = await response.json();
 
                 const remoteDesc = new RTCSessionDescription(answer);
                 await peerConnection.setRemoteDescription(remoteDesc);
             }
+
+            document.getElementById("start-btn").onclick = makeCall;
         </script>
     </body>
 </html>

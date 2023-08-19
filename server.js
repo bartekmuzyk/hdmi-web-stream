@@ -28,6 +28,7 @@ const iceCandidateCallback = new IceCandidateCallback();
 const app = express();
 app.set("view engine", "ejs");
 app.set("views", "views");
+app.use(express.json());
 
 const PORT = 7284;
 app.listen(PORT);
@@ -36,14 +37,14 @@ app.get("/", (req, res) => {
     res.render("viewer");
 });
 
-app.post("/offer", express.json(), (req, res) => {
+app.post("/offer", (req, res) => {
     offerCallback.answerCb = answer => {
         res.json(answer);
     };
     offerCallback.offerCb(req.body);
 });
 
-app.post("/ice", express.json(), (req, res) => {
+app.post("/ice", (req, res) => {
     iceCandidateCallback.candidatesCallback = candidates => {
         res.json(candidates);
     }
