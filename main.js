@@ -1,11 +1,11 @@
-const {app, BrowserWindow, ipcMain} = require("electron");
+const {app, BrowserWindow, ipcMain, shell} = require("electron");
 const path = require("path");
 const {interaction} = require("./server.js");
 
 function createWindow() {
     const win = new BrowserWindow({
         width: 650,
-        height: 300,
+        height: 330,
         resizable: false,
         webPreferences: {
             preload: path.join(__dirname, "preload.js")
@@ -25,9 +25,11 @@ function createWindow() {
         win.close();
     });
 
+    ipcMain.on("openurl", (_event, url) => {
+        shell.openExternal(url);
+    });
 
-    const sessionData = interaction.createSession();
-    win.loadURL(`http://localhost:7284/panel?${new URLSearchParams(sessionData)}`);
+    win.loadURL("http://localhost:7284/panel");
 }
 
 app.whenReady().then(() => {

@@ -1,4 +1,7 @@
 M.AutoInit(null);
+M.Modal.init(document.querySelectorAll(".modal"), {
+	dismissible: false
+});
 
 const splashScreen = document.getElementById("splash-screen");
 const streamViewer = document.getElementById("stream-viewer");
@@ -8,21 +11,11 @@ const streamPlayer = document.getElementById("stream-player");
 const watchBtnWrapper = document.getElementById("watch-btn-wrapper");
 const watchBtn = document.getElementById("watch-btn");
 
-const params = new URLSearchParams(location.search);
-const sessionId = params.get("id");
-
-if (!sessionId) {
-	location.assign("/");
-}
-
 let isWatching = false;
 const socket = io(undefined, {
 	autoConnect: false,
 	auth: {
 		username: "client"
-	},
-	query: {
-		sessionId
 	}
 });
 
@@ -84,8 +77,7 @@ socket.on("stream:state", state => {
 		loadingText.innerText = "Łączenie przez RTC...";
 		startRTCHandshake();
 	} else if (state === "stopped" && isWatching) {
-		alert("Stream zakończony.");
-		location.assign("/");
+		M.Modal.getInstance(document.getElementById("stream-ended-modal")).open();
 	}
 });
 

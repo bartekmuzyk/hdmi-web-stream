@@ -23,47 +23,38 @@ app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get("/panel", (req, res) => {
-    const sessionId = req.query["sessionId"];
+    const existingSessionIds = Object.keys(db.sessions);
 
-    if (!sessionId || !(sessionId in db.sessions)) {
-        res.send("Nieprawidłowe ID sesji.");
+    let session;
+    if (existingSessionIds.length === 0) {
+        session = db.initSession();
+
+        res.redirect(`/panel?${new URLSearchParams({ownerKey: session.ownerKey})}`);
         return;
-    }
+    } else {
+        session = db.sessions[existingSessionIds[0]];
 
-    const session = db.sessions[sessionId];
-
-    if (session.ownerKey !== req.query["ownerKey"]) {
-        res.send("Nieprawidłowy klucz uwierzytelniający.");
-        return;
+        if (session.ownerKey !== req.query["ownerKey"]) {
+            res.send("Nieprawidłowy klucz uwierzytelniający.");
+            return;
+        }
     }
 
     res.render("panel");
 });
 
-app.get("/ogladaj", (req, res) => {
-    const sessionId = req.query["id"];
-
-    if (!sessionId || !(sessionId in db.sessions)) {
-        res.send("Nieprawidłowe ID sesji (stream został zakończony?).");
-        return;
-    }
-
+app.get("/", (req, res) => {
     res.render("watch");
 });
 
 io.use((socket, next) => {
-    const sessionId = socket.handshake.query["sessionId"];
-
-    if (!sessionId || typeof sessionId !== "string" || !db.sessions.hasOwnProperty(sessionId)) {
-        next(new Error("invalid session id"));
-    }
-
     const username = socket.handshake.auth["username"];
 
     if (!username?.trim() || typeof username !== "string") {
         next(new Error("invalid username"));
     }
 
+    const sessionId = Object.keys(db.sessions)[0];
     socket.join(sessionId);
     socket.data.sessionId = sessionId;
     socket.data.isStreamer = "ownerKey" in socket.handshake.auth ?

@@ -4,13 +4,26 @@ html, body {
     height: 100%;
 }
 
+:root {
+    --status-bar-height: 60px;
+    --bottom-bar-height: 50px;
+}
+
 #status-bar {
-    height: 60px;
-    border-bottom: 1px solid #fff2;
+    height: var(--status-bar-height);
     display: flex;
     flex-direction: row;
     align-items: center;
     padding: 10px;
+}
+
+#bottom-bar {
+    height: var(--bottom-bar-height);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 10px;
+    border-top: 1px solid #fff2;
 }
 
 #live-status-dot {
@@ -21,7 +34,7 @@ html, body {
 }
 
 #live-status {
-    font-size: 2rem;
+    font-size: 24px;
     color: white;
     font-weight: bold;
     flex-grow: 1;
@@ -51,7 +64,7 @@ html, body {
 
 #device-config {
     width: 100%;
-    height: calc(100% - 60px);
+    height: calc(100% - var(--status-bar-height) - var(--bottom-bar-height));
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr;

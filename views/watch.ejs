@@ -14,40 +14,14 @@
             <div id="stream-player-wrapper">
                 <video id="stream-player"></video>
             </div>
-            <div id="side-bar" data-collapsed="0">
-                <div id="side-bar-normal-content">
-                    <button id="hide-side-bar-btn" class="btn-flat waves-effect waves-light white-text">
-                        Zwiń boczny pasek
-                        <i class="material-icons right">arrow_forward</i>
-                    </button>
-                    <div id="chat-box-wrapper">
-                        <ul id="chat-box"></ul>
-                    </div>
-                    <div style="flex: 0 0 auto; display: flex; flex-direction: row; align-items: center; padding-left: 10px;">
-                        <input id="message-editor" class="white-text" type="text" placeholder="Wyślij wiadomość na czacie" />
-                        <button id="emoji-btn" class="btn-flat grey darken-4 waves-effect waves-light white-text">
-                            <i class="material-icons">mood</i>
-                        </button>
-                        <button id="send-message-btn" class="btn-flat grey darken-4 waves-effect waves-light white-text" disabled>
-                            <i class="material-icons">send</i>
-                        </button>
-                    </div>
-                </div>
-                <div id="side-bar-collapsed-content">
-                    <button id="expand-side-bar-btn" class="btn-flat waves-effect waves-light white-text">
-                        <i class="material-icons">arrow_back</i>
-                    </button>
-                </div>
-            </div>
         </div>
         <div id="splash-screen">
             <label id="splash-streamer-info">
                 <i class="material-icons" style="font-size: inherit; position: relative; top: 4px;">settings_input_hdmi</i>
                 <span>Transmisja sygnału HDMI</span>
             </label>
-            <hr class="animated-hr" style="color: #fff2; margin: 10px 0;"/>
             <div id="watch-btn-wrapper">
-                <button id="watch-btn" class="btn-large yellow black-text waves-effect waves-dark pulse">
+                <button id="watch-btn" class="btn-large teal waves-effect waves-teal pulse">
                     <i class="material-icons left">chevron_right</i>
                     Obejrzyj transmisję
                 </button>
@@ -55,6 +29,18 @@
                     <div class="lds-spinner white-spinner"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
                     <h4 id="loading-text" class="white-text" style="margin: 0;">Oczekiwanie na rozpoczęcie transmisji...</h4>
                 </div>
+            </div>
+        </div>
+
+        <div id="stream-ended-modal" class="modal">
+            <div class="modal-content">
+                <h4>Strumień przerwany</h4>
+                <p>Strumień został najprawdopodobniej ręcznie zakończony z poziomu aplikacji pulpitowej.</p>
+            </div>
+            <div class="modal-footer">
+                <button class="waves-effect waves-teal btn-flat" onclick="location.reload()">
+                    Uruchom ponownie odbiornik
+                </button>
             </div>
         </div>
 

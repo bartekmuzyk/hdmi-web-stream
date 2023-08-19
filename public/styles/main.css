@@ -186,18 +186,6 @@ html, body {
     }
 }
 
-@keyframes horizontal-rule-animation {
-    from { width: 0; }
-    to { width: 80vw; }
-}
-
-.animated-hr {
-    animation-name: horizontal-rule-animation;
-    animation-duration: 1s;
-    animation-fill-mode: forwards;
-    animation-timing-function: cubic-bezier(0, 0, 0, 1);
-}
-
 pre {
     margin: 0;
     line-height: 0;

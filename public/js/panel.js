@@ -39,10 +39,13 @@ function getValueOfSelectedRadioButtonInGroup(group) {
 	return document.querySelector(`input[type="radio"][name="${group}"]:checked`)?.value ?? null;
 }
 
+/** @type {Object<string, MediaStream>} */
+const videoDevicesStreams = {};
+
 /**
  * @param devices {InputDeviceInfo[]}
  */
-function onGotDevices(devices) {
+async function onGotDevices(devices) {
 	const inputs = devices.filter(device => device.deviceId !== "default" && device.kind !== "audiooutput");
 
 	if (inputs.length === 0) {
@@ -62,6 +65,20 @@ function onGotDevices(devices) {
 			case "videoinput":
 				videoInputCount++;
 				videoInputSelect.appendChild(optionElement);
+
+				console.log(`getting stream for device ${input.label} (${input.deviceId})...`)
+				const stream = await navigator.mediaDevices.getUserMedia({
+					video: {
+						deviceId: {exact: input.deviceId},
+						width: {exact: 1280},
+						height: {exact: 720},
+						frameRate: 60
+					},
+					audio: false
+				});
+				videoDevicesStreams[input.deviceId] = stream;
+				console.log("got it!");
+
 				break;
 			case "audioinput":
 				audioInputCount++;
@@ -89,29 +106,20 @@ function onGotDevices(devices) {
  */
 function setStreamStateDisplay(status) {
 	statusBar.setAttribute("data-livestatus", status);
-
-	switch (status) {
-		case "started": liveStatus.innerText = "Transmituję"; break;
-		case "progress": liveStatus.innerText = "Czekaj..."; break;
-		case "stopped": liveStatus.innerText = "Wstrzymany"; break;
-	}
+	liveStatus.innerText = {
+		"started": "Transmituję",
+		"progress": "Czekaj...",
+		"stopped": "Wstrzymany"
+	}[status] ?? "Błąd";
 }
 
 const params = new URLSearchParams(location.search);
-const sessionId = params.get("sessionId");
 const ownerKey = params.get("ownerKey");
-
-if (!sessionId || !ownerKey) {
-	location.assign("/");
-}
 
 const socket = io(undefined, {
 	auth: {
 		username: "HDMI",
 		ownerKey
-	},
-	query: {
-		sessionId
 	}
 });
 
@@ -119,7 +127,7 @@ socket.on("connect", () => {
 	liveStatus.innerText = "Skanowanie urządzeń...";
 	navigator.mediaDevices.enumerateDevices()
 		.then(onGotDevices)
-		.finally(() => {
+		.then(() => {
 			setStreamStateDisplay("stopped");
 		});
 });
@@ -197,15 +205,7 @@ socket.on("rtc:iceCandidate", async (socketId, candidate) => {
 socket.on("stream:clientLeft", socketId => {
 	peerConnections[socketId].close();
 	delete peerConnections[socketId];
-	document.querySelector(`#viewers-list > div[data-socketid="${socketId}"]`).remove()
 });
-
-/**
- * @typedef {Object} StreamSource
- * @property {string} id id of the source. will begin with `window:` if the source is a window, and with `screen:` if it is a screen
- * @property {string} name app/screen name
- * @property {?string} icon icon data as a data URL. `undefined` if the source is a screen.
- */
 
 goLiveBtn.onclick = async () => {
 	const videoDeviceId = getValueOfSelectedRadioButtonInGroup("videoinput");
@@ -216,22 +216,42 @@ goLiveBtn.onclick = async () => {
 
 	const audioDeviceId = getValueOfSelectedRadioButtonInGroup("audioinput");
 	if (audioDeviceId === null) {
-		alert("Nie wybrano urządzenia audio.");
-		return;
+		alert("Nie wybrano urządzenia audio. Strumień nie będzie zawierał dźwięku.");
 	}
 
 	goLiveBtn.disabled = true;
+	document.getElementById("refresh-btn").disabled = true;
 	setStreamStateDisplay("progress");
 
 	console.log(`video device id: ${videoDeviceId}`);
 	console.log(`audio device id: ${audioDeviceId}`);
 
-	currentStream = await navigator.mediaDevices.getUserMedia({
-		video: {deviceId: {exact: videoDeviceId}},
-		audio: {deviceId: {exact: audioDeviceId}},
-	});
+	const videoStream = videoDevicesStreams[videoDeviceId].clone();
+	console.log("got a clone of the video stream! adding audio tracks to it...");
+
+	if (audioDeviceId !== null) {
+		const audioStream = await navigator.mediaDevices.getUserMedia({
+			video: false,
+			audio: {
+				deviceId: {exact: audioDeviceId},
+				autoGainControl: false,
+				channelCount: 2,
+				echoCancellation: false,
+				latency: 0,
+				noiseSuppression: false,
+				sampleRate: 48000,
+				sampleSize: 16
+			},
+		});
+		console.log("got audio stream!");
+
+		for (const audioTrack of audioStream.getAudioTracks()) {
+			videoStream.addTrack(audioTrack);
+		}
+	}
+
+	currentStream = videoStream;
 	socket.emit("stream:start");
-	console.log(location.origin + "/ogladaj?id=" + sessionId);
 };
 
 stopStreamBtn.onclick = () => {

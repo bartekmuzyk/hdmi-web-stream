@@ -13,10 +13,7 @@
         <div id="status-bar" data-livestatus="connecting">
             <div id="live-status-dot"></div>
             <label id="live-status">Łączenie...</label>
-            <button class="waves-effect waves-light btn-flat white-text" onclick="window.desktopAppApi.openDevTools();" style="margin-right: 10px;">
-                <i class="material-icons left">code</i> DevTools
-            </button>
-            <button id="go-live-btn" class="waves-effect waves-light btn" disabled>
+            <button id="go-live-btn" class="waves-effect waves-light btn green" disabled>
                 <i class="material-icons left">play_arrow</i>
                 Start
             </button>
@@ -30,6 +27,19 @@
             <h4>Wejście audio</h4>
             <div id="video-input-select"></div>
             <div id="audio-input-select"></div>
+        </div>
+        <div id="bottom-bar">
+            <button class="waves-effect waves-light btn blue" onclick="window.desktopAppApi.openUrlInBrowser(location.origin);">
+                <i class="material-icons left">live_tv</i>
+                Otwórz odbiornik
+            </button>
+            <button id="refresh-btn" class="waves-effect waves-light btn-flat white-text" onclick="location.reload();">
+                <i class="material-icons left">refresh</i> Odśwież
+            </button>
+            <div style="flex: 1 0 auto;"></div>
+            <button class="waves-effect waves-light btn-flat white-text" onclick="window.desktopAppApi.openDevTools();">
+                <i class="material-icons left">code</i> DevTools
+            </button>
         </div>
 
         <div id="connection-error-modal" class="modal">
