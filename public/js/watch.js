@@ -86,4 +86,5 @@ watchBtn.onclick = () => void setTimeout(startWatching, 100);
 function startWatching() {
 	watchBtnWrapper.setAttribute("data-clicked", "1");
 	socket.connect();
+	document.body.requestFullscreen({navigationUI: "hide"});
 }

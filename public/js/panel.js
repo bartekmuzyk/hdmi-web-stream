@@ -17,6 +17,16 @@ const disconnectReasonLabel = document.getElementById("disconnect-reason");
 const disconnectionModal = M.Modal.getInstance(document.getElementById("disconnection-modal"));
 const videoInputSelect = document.getElementById("video-input-select");
 const audioInputSelect = document.getElementById("audio-input-select");
+const resolutionBtn = document.getElementById("resolution-btn");
+const resolutionModal = document.getElementById("resolution-modal");
+const resolutionWidthInput = document.getElementById("resolution-width-input");
+const resolutionHeightInput = document.getElementById("resolution-height-input");
+const resolutionSaveBtn = document.getElementById("resolution-save-btn");
+
+if (!localStorage.getItem("res.width") || !localStorage.getItem("res.height")) {
+	localStorage.setItem("res.width", "1280");
+	localStorage.setItem("res.height", "720");
+}
 
 function createInputRadioButton(text, value, group) {
 	const p = document.createElement("p");
@@ -31,6 +41,12 @@ function createInputRadioButton(text, value, group) {
 	span.innerText = text;
 	label.appendChild(span);
 	p.appendChild(label);
+	p.onclick = () => {
+		document.getElementsByTagName("html")[0].scrollTo({
+			top: 0,
+			behavior: "instant"
+		});
+	};
 
 	return p;
 }
@@ -58,6 +74,22 @@ async function onGotDevices(devices) {
 	let videoInputCount = 0;
 	let audioInputCount = 0;
 
+	audioInputSelect.appendChild(createInputRadioButton("Bez audio", "without", "audioinput"));
+
+	const resolution = {
+		width: parseInt(localStorage.getItem("res.width").trim()),
+		height: parseInt(localStorage.getItem("res.height").trim())
+	};
+
+	if (isNaN(resolution.width)) resolution.width = 1280;
+	if (isNaN(resolution.height)) resolution.height = 720;
+
+	localStorage.setItem("res.width", resolution.width.toString());
+	resolutionWidthInput.value = resolution.width.toString();
+	localStorage.setItem("res.height", resolution.height.toString());
+	resolutionHeightInput.value = resolution.height.toString();
+	M.updateTextFields();
+
 	for (const input of inputs) {
 		const optionElement = createInputRadioButton(input.label, input.deviceId, input.kind);
 
@@ -70,8 +102,8 @@ async function onGotDevices(devices) {
 				const stream = await navigator.mediaDevices.getUserMedia({
 					video: {
 						deviceId: {exact: input.deviceId},
-						width: {exact: 1280},
-						height: {exact: 720},
+						width: {ideal: resolution.width},
+						height: {ideal: resolution.height},
 						frameRate: 60
 					},
 					audio: false
@@ -221,6 +253,7 @@ goLiveBtn.onclick = async () => {
 
 	goLiveBtn.disabled = true;
 	document.getElementById("refresh-btn").disabled = true;
+	resolutionBtn.disabled = true;
 	setStreamStateDisplay("progress");
 
 	console.log(`video device id: ${videoDeviceId}`);
@@ -229,7 +262,7 @@ goLiveBtn.onclick = async () => {
 	const videoStream = videoDevicesStreams[videoDeviceId].clone();
 	console.log("got a clone of the video stream! adding audio tracks to it...");
 
-	if (audioDeviceId !== null) {
+	if (audioDeviceId !== null && audioDeviceId !== "without") {
 		const audioStream = await navigator.mediaDevices.getUserMedia({
 			video: false,
 			audio: {
@@ -268,5 +301,15 @@ stopStreamBtn.onclick = () => {
 
 	setStreamStateDisplay("stopped");
 	M.toast({ html: "Transmisja zakończona. Proszę czekać..." });
+	location.reload();
+};
+
+resolutionBtn.onclick = () => {
+	M.Modal.getInstance(resolutionModal).open();
+}
+
+resolutionSaveBtn.onclick = () => {
+	localStorage.setItem("res.width", resolutionWidthInput.value);
+	localStorage.setItem("res.height", resolutionHeightInput.value);
 	location.reload();
 };

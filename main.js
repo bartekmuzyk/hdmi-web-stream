@@ -1,19 +1,29 @@
-const {app, BrowserWindow, ipcMain, shell} = require("electron");
+const {app, BrowserWindow, ipcMain, shell, Tray, Menu} = require("electron");
 const path = require("path");
-const {interaction} = require("./server.js");
+require("./server.js");
+
+let allowWindowClose = false;
 
 function createWindow() {
     const win = new BrowserWindow({
-        width: 650,
-        height: 330,
+        width: 800,
+        height: 450,
         resizable: false,
         webPreferences: {
             preload: path.join(__dirname, "preload.js")
-        }
+        },
+        icon: path.join(__dirname, "icon.png")
     });
     win.setMenu(null);
     win.removeMenu();
     win.menuBarVisible = false;
+
+    win.on("close", event => {
+        if (!allowWindowClose) {
+            event.preventDefault();
+            win.hide();
+        }
+    });
 
     ipcMain.on("opendevtools", () => {
         win.webContents.openDevTools({
@@ -22,7 +32,8 @@ function createWindow() {
     });
 
     ipcMain.on("quit", () => {
-        win.close();
+        allowWindowClose = true;
+        app.quit();
     });
 
     ipcMain.on("openurl", (_event, url) => {
@@ -30,16 +41,35 @@ function createWindow() {
     });
 
     win.loadURL("http://localhost:7284/panel");
+
+    return win;
 }
 
 app.whenReady().then(() => {
-    createWindow();
+    const win = createWindow();
+
+    const tray = new Tray(path.join(__dirname, "icon.png"));
+    tray.setToolTip("Transmiter sygnału HDMI");
+    tray.on("click", () => {
+        win.show();
+    });
+    tray.setContextMenu(Menu.buildFromTemplate([
+        {
+            label: "Pokaż panel",
+            click() {
+                win.show();
+            }
+        },
+        {
+            label: "Zakończ",
+            click() {
+                allowWindowClose = true;
+                app.quit();
+            }
+        }
+    ]));
 
     app.on("activate", () => {
        if (BrowserWindow.getAllWindows().length === 0) createWindow();
     });
-});
-
-app.on("window-all-closed", () => {
-    if (process.platform !== "darwin") app.quit();
 });

@@ -13,6 +13,18 @@
         <div id="status-bar" data-livestatus="connecting">
             <div id="live-status-dot"></div>
             <label id="live-status">Łączenie...</label>
+            <button class="waves-effect waves-light btn-flat white-text" onclick="window.desktopAppApi.openDevTools();">
+                <i class="material-icons">code</i>
+            </button>
+            <button class="waves-effect waves-light btn-flat white-text" onclick="window.desktopAppApi.openUrlInBrowser(location.origin);">
+                <i class="material-icons">live_tv</i>
+            </button>
+            <button id="resolution-btn" class="waves-effect waves-light btn-flat white-text">
+                <i class="material-icons">build</i>
+            </button>
+            <button id="refresh-btn" class="waves-effect waves-light btn-flat white-text" onclick="location.reload();">
+                <i class="material-icons">refresh</i>
+            </button>
             <button id="go-live-btn" class="waves-effect waves-light btn green" disabled>
                 <i class="material-icons left">play_arrow</i>
                 Start
@@ -27,19 +39,6 @@
             <h4>Wejście audio</h4>
             <div id="video-input-select"></div>
             <div id="audio-input-select"></div>
-        </div>
-        <div id="bottom-bar">
-            <button class="waves-effect waves-light btn blue" onclick="window.desktopAppApi.openUrlInBrowser(location.origin);">
-                <i class="material-icons left">live_tv</i>
-                Otwórz odbiornik
-            </button>
-            <button id="refresh-btn" class="waves-effect waves-light btn-flat white-text" onclick="location.reload();">
-                <i class="material-icons left">refresh</i> Odśwież
-            </button>
-            <div style="flex: 1 0 auto;"></div>
-            <button class="waves-effect waves-light btn-flat white-text" onclick="window.desktopAppApi.openDevTools();">
-                <i class="material-icons left">code</i> DevTools
-            </button>
         </div>
 
         <div id="connection-error-modal" class="modal">
@@ -69,6 +68,36 @@
             <div class="modal-footer">
                 <button class="waves-effect waves-dark black-text btn-flat" onclick="location.reload();">
                     Spróbuj od nowa
+                </button>
+            </div>
+        </div>
+
+        <div id="resolution-modal" class="modal">
+            <div class="modal-content">
+                <h4>Rozdzielczość</h4>
+                <div class="row">
+                    <form class="col s12">
+                        <div class="row">
+                            <div class="input-field col s6">
+                                <i class="material-icons prefix">swap_horiz</i>
+                                <input id="resolution-width-input" type="text">
+                                <label for="resolution-width-input" class="active">Szerokość</label>
+                            </div>
+                            <div class="input-field col s6">
+                                <i class="material-icons prefix">swap_vert</i>
+                                <input id="resolution-height-input" type="text">
+                                <label for="resolution-height-input" class="active">Wysokość</label>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="waves-effect waves-dark black-text btn-flat modal-close">
+                    Anuluj
+                </button>
+                <button id="resolution-save-btn" class="waves-effect waves-dark black-text btn-flat">
+                    Zapisz
                 </button>
             </div>
         </div>

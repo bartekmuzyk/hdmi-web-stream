@@ -4,26 +4,18 @@ html, body {
     height: 100%;
 }
 
-:root {
-    --status-bar-height: 60px;
-    --bottom-bar-height: 50px;
+body {
+    display: flex;
+    flex-direction: column;
 }
 
 #status-bar {
-    height: var(--status-bar-height);
     display: flex;
     flex-direction: row;
     align-items: center;
+    flex: 0 0 60px;
     padding: 10px;
-}
-
-#bottom-bar {
-    height: var(--bottom-bar-height);
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    padding: 10px;
-    border-top: 1px solid #fff2;
+    border-bottom: 1px solid #3A3A3B;
 }
 
 #live-status-dot {
@@ -53,7 +45,7 @@ html, body {
 }
 
 #status-bar[data-livestatus="connecting"] > #live-status-dot {
-    background-color: gray;
+    background-color: rgb(128, 128, 128);
 }
 
 #device-config h4 {
@@ -63,11 +55,11 @@ html, body {
 }
 
 #device-config {
-    width: 100%;
-    height: calc(100% - var(--status-bar-height) - var(--bottom-bar-height));
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto 1fr;
+    flex: 1 1 auto;
+    overflow: hidden;
 }
 
 #device-config > div {
@@ -78,6 +70,10 @@ html, body {
 
 #device-config > h4 {
     padding: 0 10px;
+}
+
+#go-live-btn, #stop-stream-btn {
+    margin-left: 5px;
 }
 
 ::-webkit-scrollbar {

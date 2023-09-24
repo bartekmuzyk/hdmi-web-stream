@@ -192,18 +192,3 @@ function onListening() {
     const bind = typeof addr === 'string' ? 'pipe ' + addr : 'port ' + addr.port;
     debug('Listening on ' + bind);
 }
-
-class Interaction {
-    createSession() {
-        const session = db.initSession();
-
-        return {
-            sessionId: session.id,
-            ownerKey: session.ownerKey
-        };
-    }
-}
-
-module.exports = {
-    interaction: new Interaction()
-};
