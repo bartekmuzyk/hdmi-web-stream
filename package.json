@@ -10,7 +10,8 @@
   "author": "bmbl",
   "license": "ISC",
   "devDependencies": {
-    "electron": "^25.4.0"
+    "electron": "^25.4.0",
+    "electron-builder": "^24.6.4"
   },
   "dependencies": {
     "cookie-parser": "^1.4.6",
