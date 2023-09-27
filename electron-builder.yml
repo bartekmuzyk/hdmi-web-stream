@@ -1,7 +1,5 @@
 appId: "pl.bmbl.hdmiwebstream"
 productName: "HDMI Web Stream"
 linux:
-  target: "deb"
-  icon: "icon32x32.png"
-deb:
-  depends: ["gconf2", "gconf-service", "libnotify4", "libxtst6", "libnss3"]
+  target: "tar.gz"
+  icon: "icon256x256.png"

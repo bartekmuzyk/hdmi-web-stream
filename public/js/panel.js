@@ -52,7 +52,8 @@ function createInputRadioButton(text, value, group) {
 }
 
 function getValueOfSelectedRadioButtonInGroup(group) {
-	return document.querySelector(`input[type="radio"][name="${group}"]:checked`)?.value ?? null;
+	const el = document.querySelector(`input[type="radio"][name="${group}"]:checked`);
+	return el ? el.value : null;
 }
 
 /** @type {Object<string, MediaStream>} */
