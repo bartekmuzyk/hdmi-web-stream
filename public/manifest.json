@@ -1,0 +1,22 @@
+{
+  "short_name": "HDMI",
+  "name": "Odbiornik HDMI",
+  "icons": [
+    {
+      "src": "/icons/icons128.png",
+      "type": "image/png",
+      "sizes": "128x128"
+    },
+    {
+      "src": "/icons/icons192.png",
+      "type": "image/png",
+      "sizes": "192x192"
+    },
+    {
+      "src": "/icons/icons512.png",
+      "type": "image/png",
+      "sizes": "512x512"
+    }
+  ],
+  "display": "fullscreen"
+}

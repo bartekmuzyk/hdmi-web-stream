@@ -21,12 +21,18 @@ const resolutionBtn = document.getElementById("resolution-btn");
 const resolutionModal = document.getElementById("resolution-modal");
 const resolutionWidthInput = document.getElementById("resolution-width-input");
 const resolutionHeightInput = document.getElementById("resolution-height-input");
+const prefer30FpsCheckbox = document.getElementById("prefer-30fps-checkbox");
 const resolutionSaveBtn = document.getElementById("resolution-save-btn");
 
-if (!localStorage.getItem("res.width") || !localStorage.getItem("res.height")) {
-	localStorage.setItem("res.width", "1280");
-	localStorage.setItem("res.height", "720");
+function setDefaultForSetting(key, value) {
+	if (!localStorage.getItem(key)) {
+		localStorage.setItem(key, value);
+	}
 }
+
+setDefaultForSetting("res.width", "1280");
+setDefaultForSetting("res.height", "720");
+setDefaultForSetting("prefer30fps", "0");
 
 function createInputRadioButton(text, value, group) {
 	const p = document.createElement("p");
@@ -75,7 +81,7 @@ async function onGotDevices(devices) {
 	let videoInputCount = 0;
 	let audioInputCount = 0;
 
-	audioInputSelect.appendChild(createInputRadioButton("Bez audio", "without", "audioinput"));
+	audioInputSelect.appendChild(createInputRadioButton("🚫 Bez audio", "without", "audioinput"));
 
 	const resolution = {
 		width: parseInt(localStorage.getItem("res.width").trim()),
@@ -91,13 +97,14 @@ async function onGotDevices(devices) {
 	resolutionHeightInput.value = resolution.height.toString();
 	M.updateTextFields();
 
-	for (const input of inputs) {
-		const optionElement = createInputRadioButton(input.label, input.deviceId, input.kind);
+	const prefer30Fps = localStorage.getItem("prefer30fps") === "1";
+	prefer30FpsCheckbox.checked = prefer30Fps;
 
+	for (const input of inputs) {
 		switch (input.kind) {
 			case "videoinput":
 				videoInputCount++;
-				videoInputSelect.appendChild(optionElement);
+				videoInputSelect.appendChild(createInputRadioButton(`📹 ${input.label}`, input.deviceId, input.kind));
 
 				console.log(`getting stream for device ${input.label} (${input.deviceId})...`)
 				const stream = await navigator.mediaDevices.getUserMedia({
@@ -105,7 +112,7 @@ async function onGotDevices(devices) {
 						deviceId: {exact: input.deviceId},
 						width: {ideal: resolution.width},
 						height: {ideal: resolution.height},
-						frameRate: 60
+						frameRate: prefer30Fps ? 30 : 60
 					},
 					audio: false
 				});
@@ -115,9 +122,31 @@ async function onGotDevices(devices) {
 				break;
 			case "audioinput":
 				audioInputCount++;
-				audioInputSelect.appendChild(optionElement);
+				audioInputSelect.appendChild(createInputRadioButton(`🎙️ ${input.label}`, input.deviceId, input.kind));
 				break;
 		}
+	}
+
+	const desktopSources = await window.desktopAppApi.getDesktopSources();
+
+	for (const [id, name] of Object.entries(desktopSources)) {
+		const optionElement = createInputRadioButton(`🖥️ ${name}`, id, "videoinput");
+		videoInputCount++;
+		videoInputSelect.appendChild(optionElement);
+
+		videoDevicesStreams[id] = await navigator.mediaDevices.getUserMedia({
+			audio: false,
+			video: {
+				mandatory: {
+					chromeMediaSource: "desktop",
+					chromeMediaSourceId: id,
+					minWidth: resolution.width,
+					maxWidth: resolution.width,
+					minHeight: resolution.height,
+					maxHeight: resolution.height
+				}
+			}
+		});
 	}
 
 	if (videoInputCount === 0) {
@@ -312,5 +341,6 @@ resolutionBtn.onclick = () => {
 resolutionSaveBtn.onclick = () => {
 	localStorage.setItem("res.width", resolutionWidthInput.value);
 	localStorage.setItem("res.height", resolutionHeightInput.value);
+	localStorage.setItem("prefer30fps", prefer30FpsCheckbox.checked ? "1" : "0");
 	location.reload();
 };

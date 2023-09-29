@@ -77,14 +77,28 @@ socket.on("stream:state", state => {
 		loadingText.innerText = "Łączenie przez RTC...";
 		startRTCHandshake();
 	} else if (state === "stopped" && isWatching) {
-		M.Modal.getInstance(document.getElementById("stream-ended-modal")).open();
+		M.toast({ html: "Strumień przerwany", displayLength: 99999 });
+
+		try {
+			document.exitFullscreen();
+		} catch (e) {}
+
+		location.reload();
 	}
 });
 
 watchBtn.onclick = () => void setTimeout(startWatching, 100);
 
+function tryFullscreen() {
+	try {
+		document.documentElement.requestFullscreen({navigationUI: "hide"});
+	} catch (e) {}
+}
+
 function startWatching() {
 	watchBtnWrapper.setAttribute("data-clicked", "1");
 	socket.connect();
-	document.body.requestFullscreen({navigationUI: "hide"});
+	tryFullscreen();
 }
+
+tryFullscreen();

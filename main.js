@@ -1,4 +1,4 @@
-const {app, BrowserWindow, ipcMain, shell, Tray, Menu} = require("electron");
+const {app, BrowserWindow, ipcMain, shell, Tray, Menu, desktopCapturer} = require("electron");
 const path = require("path");
 require("./server.js");
 
@@ -38,6 +38,18 @@ function createWindow() {
 
     ipcMain.on("openurl", (_event, url) => {
         shell.openExternal(url);
+    });
+
+    ipcMain.handle("desktopsources", async () => {
+        const sources = await desktopCapturer.getSources({
+            types: ["screen"],
+            thumbnailSize: {width: 0, height: 0}
+        });
+
+        const screens = {};
+        for (const source of sources) screens[source.id] = source.name;
+
+        return screens;
     });
 
     win.loadURL("http://localhost:7284/panel");
